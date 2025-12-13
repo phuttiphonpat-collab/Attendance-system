@@ -1,0 +1,1681 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration Manager - Continent International School</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    .student-row {
+      transition: background-color 0.2s;
+    }
+    
+    .student-row:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    .status-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    
+    .status-btn.active {
+      border-color: #1e40af;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .status-present {
+      background-color: #10b981;
+      color: white;
+    }
+    
+    .status-absent {
+      background-color: #ef4444;
+      color: white;
+    }
+    
+    .status-late {
+      background-color: #f59e0b;
+      color: white;
+    }
+    
+    .status-excused {
+      background-color: #6366f1;
+      color: white;
+    }
+    
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+    
+    .tab-btn.active {
+      border-bottom-color: #3b82f6;
+      color: #3b82f6;
+    }
+    
+    .summary-card {
+      padding: 1rem;
+      border-radius: 0.5rem;
+      text-align: center;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="app-wrapper" class="h-full w-full overflow-auto">
+   <div class="min-h-full"><!-- Header -->
+    <header class="shadow-sm">
+     <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex justify-between items-center">
+       <div>
+        <h1 id="school-name" class="text-2xl font-bold">Continent International School</h1>
+        <p id="system-title" class="text-sm mt-1">Registration Manager</p>
+       </div>
+       <div class="text-right">
+        <div id="current-date" class="font-semibold"></div>
+        <div id="current-time" class="text-sm"></div>
+       </div>
+      </div>
+     </div>
+    </header>
+    <div class="max-w-7xl mx-auto px-6 py-6"><!-- Class Selection -->
+     <div class="rounded-lg shadow-md p-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div><label for="class-select" class="block text-sm font-semibold mb-2">Select Class/Form</label> <select id="class-select" class="w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2"> <option value="">Choose a class...</option> <option value="Year 5 River" selected>Year 5 River</option> </select>
+       </div>
+       <div class="flex items-end"><button id="load-register-btn" class="w-full font-semibold py-2 px-6 rounded-lg transition-colors"> Load Register </button>
+       </div>
+      </div>
+     </div><!-- Tab Navigation -->
+     <div id="register-section" class="hidden">
+      <div class="rounded-lg shadow-md mb-6">
+       <div class="flex border-b"><button onclick="switchTab('register')" class="tab-btn active" id="tab-register"> 📋 Today's Register </button> <button onclick="switchTab('history')" class="tab-btn" id="tab-history"> 📊 Attendance History </button> <button onclick="switchTab('reports')" class="tab-btn" id="tab-reports"> 📈 Reports &amp; Analytics </button>
+       </div>
+      </div><!-- Register Tab Content -->
+      <div id="content-register" class="tab-content"><!-- Quick Actions Bar -->
+       <div class="rounded-lg shadow-md p-4 mb-6">
+        <div class="flex flex-wrap gap-3"><button onclick="showStudentManagement()" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #8b5cf6; color: white;"> 👥 Manage Students </button> <button onclick="markAllPresent()" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #10b981; color: white;"> ✓ Mark All Present </button> <button onclick="clearAllAttendance()" class="px-4 py-2 rounded-lg font-semibold transition-colors" style="background-color: #ef4444; color: white;"> ✗ Clear All </button> <button onclick="submitRegister()" class="px-4 py-2 rounded-lg font-semibold transition-colors ml-auto" id="submit-register-btn"> 💾 Submit Register </button>
+        </div>
+       </div><!-- Summary Cards -->
+       <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <div class="summary-card" style="background-color: #dbeafe;">
+         <div class="text-3xl font-bold" id="total-students">
+          0
+         </div>
+         <div class="text-sm font-semibold mt-1">
+          Total Students
+         </div>
+        </div>
+        <div class="summary-card" style="background-color: #d1fae5;">
+         <div class="text-3xl font-bold" id="present-count">
+          0
+         </div>
+         <div class="text-sm font-semibold mt-1">
+          Present
+         </div>
+        </div>
+        <div class="summary-card" style="background-color: #fee2e2;">
+         <div class="text-3xl font-bold" id="absent-count">
+          0
+         </div>
+         <div class="text-sm font-semibold mt-1">
+          Absent Unexcused
+         </div>
+        </div>
+        <div class="summary-card" style="background-color: #fef3c7;">
+         <div class="text-3xl font-bold" id="late-count">
+          0
+         </div>
+         <div class="text-sm font-semibold mt-1">
+          Late
+         </div>
+        </div>
+        <div class="summary-card" style="background-color: #e0e7ff;">
+         <div class="text-3xl font-bold" id="excused-count">
+          0
+         </div>
+         <div class="text-sm font-semibold mt-1">
+          Absent Excused
+         </div>
+        </div>
+       </div><!-- Student Register Table -->
+       <div class="rounded-lg shadow-md overflow-hidden">
+        <table class="w-full">
+         <thead>
+          <tr style="background-color: #1e40af; color: white;">
+           <th class="px-6 py-3 text-left font-semibold">Student Name</th>
+           <th class="px-6 py-3 text-left font-semibold">Student ID</th>
+           <th class="px-6 py-3 text-center font-semibold">Attendance Status</th>
+           <th class="px-6 py-3 text-left font-semibold">Notes/Reason</th>
+          </tr>
+         </thead>
+         <tbody id="student-list"><!-- Students will be inserted here -->
+         </tbody>
+        </table>
+       </div>
+      </div><!-- History Tab Content -->
+      <div id="content-history" class="tab-content hidden">
+       <div class="rounded-lg shadow-md p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+         <div><label for="history-date-filter" class="block text-sm font-semibold mb-2">Filter by Date</label> <input type="date" id="history-date-filter" class="w-full px-4 py-2 border-2 rounded-lg" onchange="filterHistory()">
+         </div>
+         <div><label for="history-student-filter" class="block text-sm font-semibold mb-2">Filter by Student</label> <select id="history-student-filter" class="w-full px-4 py-2 border-2 rounded-lg" onchange="filterHistory()"> <option value="">All Students</option> </select>
+         </div>
+         <div class="flex items-end"><button onclick="clearHistoryFilters()" class="w-full bg-gray-500 text-white font-semibold py-2 px-6 rounded-lg"> Clear Filters </button>
+         </div>
+        </div>
+       </div>
+       <div class="rounded-lg shadow-md overflow-hidden" id="history-table-container">
+        <table class="w-full">
+         <thead>
+          <tr style="background-color: #1e40af; color: white;">
+           <th class="px-6 py-3 text-left font-semibold">Date</th>
+           <th class="px-6 py-3 text-left font-semibold">Time</th>
+           <th class="px-6 py-3 text-left font-semibold">Student Name</th>
+           <th class="px-6 py-3 text-left font-semibold">Student ID</th>
+           <th class="px-6 py-3 text-center font-semibold">Status</th>
+           <th class="px-6 py-3 text-left font-semibold">Notes</th>
+           <th class="px-6 py-3 text-center font-semibold">Actions</th>
+          </tr>
+         </thead>
+         <tbody id="history-list"><!-- History will be inserted here -->
+         </tbody>
+        </table>
+       </div>
+       <div id="history-empty" class="text-center py-16 hidden">
+        <div class="text-6xl mb-4">
+         📭
+        </div>
+        <h3 class="text-2xl font-bold mb-2">No Attendance Records Found</h3>
+        <p class="text-lg">Submit a register to see attendance history</p>
+       </div>
+      </div><!-- Reports Tab Content -->
+      <div id="content-reports" class="tab-content hidden">
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"><!-- Overall Statistics Card -->
+        <div class="rounded-lg shadow-md p-6">
+         <h3 class="text-xl font-bold mb-4">Overall Statistics</h3>
+         <div class="space-y-3">
+          <div class="flex justify-between items-center"><span class="font-semibold">Total Records:</span> <span class="text-2xl font-bold" id="stats-total-records">0</span>
+          </div>
+          <div class="flex justify-between items-center"><span class="font-semibold">Average Attendance Rate:</span> <span class="text-2xl font-bold text-green-600" id="stats-avg-rate">0%</span>
+          </div>
+          <div class="flex justify-between items-center"><span class="font-semibold">Most Punctual Student:</span> <span class="font-bold" id="stats-best-student">-</span>
+          </div>
+         </div>
+        </div><!-- Student Performance Card -->
+        <div class="rounded-lg shadow-md p-6">
+         <h3 class="text-xl font-bold mb-4">Student Performance</h3>
+         <div><label for="report-student-select" class="block text-sm font-semibold mb-2">Select Student</label> <select id="report-student-select" class="w-full px-4 py-2 border-2 rounded-lg mb-4" onchange="updateStudentReport()"> <option value="">Choose a student...</option> </select>
+          <div id="student-report-details" class="space-y-2">
+           <div class="flex justify-between"><span>Total Days:</span> <span class="font-bold" id="report-total-days">0</span>
+           </div>
+           <div class="flex justify-between"><span>Present:</span> <span class="font-bold text-green-600" id="report-present">0</span>
+           </div>
+           <div class="flex justify-between"><span>Absent:</span> <span class="font-bold text-red-600" id="report-absent">0</span>
+           </div>
+           <div class="flex justify-between"><span>Late:</span> <span class="font-bold text-yellow-600" id="report-late">0</span>
+           </div>
+           <div class="flex justify-between"><span>Excused:</span> <span class="font-bold text-blue-600" id="report-excused">0</span>
+           </div>
+           <div class="flex justify-between pt-2 border-t-2"><span class="font-semibold">Attendance Rate:</span> <span class="font-bold text-lg" id="report-rate">0%</span>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div><!-- Status Breakdown Chart -->
+       <div class="rounded-lg shadow-md p-6 mb-6">
+        <h3 class="text-xl font-bold mb-4">Status Breakdown</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+         <div class="text-center p-4 rounded-lg" style="background-color: #d1fae5;">
+          <div class="text-4xl font-bold text-green-700" id="breakdown-present">
+           0
+          </div>
+          <div class="text-sm font-semibold mt-2">
+           Present
+          </div>
+          <div class="text-xs" id="breakdown-present-pct">
+           0%
+          </div>
+         </div>
+         <div class="text-center p-4 rounded-lg" style="background-color: #fee2e2;">
+          <div class="text-4xl font-bold text-red-700" id="breakdown-absent">
+           0
+          </div>
+          <div class="text-sm font-semibold mt-2">
+           Absent
+          </div>
+          <div class="text-xs" id="breakdown-absent-pct">
+           0%
+          </div>
+         </div>
+         <div class="text-center p-4 rounded-lg" style="background-color: #fef3c7;">
+          <div class="text-4xl font-bold text-yellow-700" id="breakdown-late">
+           0
+          </div>
+          <div class="text-sm font-semibold mt-2">
+           Late
+          </div>
+          <div class="text-xs" id="breakdown-late-pct">
+           0%
+          </div>
+         </div>
+         <div class="text-center p-4 rounded-lg" style="background-color: #e0e7ff;">
+          <div class="text-4xl font-bold text-blue-700" id="breakdown-excused">
+           0
+          </div>
+          <div class="text-sm font-semibold mt-2">
+           Excused
+          </div>
+          <div class="text-xs" id="breakdown-excused-pct">
+           0%
+          </div>
+         </div>
+        </div>
+       </div><!-- Export Options -->
+       <div class="rounded-lg shadow-md p-6">
+        <h3 class="text-xl font-bold mb-4">Export &amp; Actions</h3>
+        <div class="flex flex-wrap gap-3"><button onclick="exportToCSV()" class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"> 📥 Export to CSV </button> <button onclick="printReport()" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"> 🖨️ Print Report </button> <button onclick="clearAllData()" class="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 ml-auto"> 🗑️ Clear All Data </button>
+        </div>
+       </div>
+      </div>
+     </div><!-- Empty State -->
+     <div id="empty-state" class="text-center py-16">
+      <div class="text-6xl mb-4">
+       📋
+      </div>
+      <h3 class="text-2xl font-bold mb-2">Select a Class to Begin Registration</h3>
+      <p class="text-lg">Choose a class above and click "Load Register" to begin</p>
+     </div>
+    </div>
+   </div><!-- Student Management Modal -->
+   <div id="student-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+     <h3 class="text-xl font-bold mb-4">Manage Students - <span id="modal-class-name"></span></h3><!-- Add Student Form -->
+     <div class="bg-gray-50 rounded-lg p-4 mb-4">
+      <h4 class="font-semibold mb-3">Add New Student</h4>
+      <form id="add-student-form" class="flex gap-3"><input type="text" id="new-student-name" placeholder="Student Name" required class="flex-1 px-3 py-2 border-2 rounded-lg"> <input type="text" id="new-student-id" placeholder="Student ID" required class="w-32 px-3 py-2 border-2 rounded-lg"> <button type="submit" class="bg-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-purple-700"> ➕ Add </button>
+      </form>
+     </div><!-- Student List -->
+     <div class="mb-4">
+      <h4 class="font-semibold mb-3">Current Students (<span id="student-modal-count">0</span>)</h4>
+      <div id="student-management-list" class="space-y-2 max-h-96 overflow-y-auto"><!-- Student items will be inserted here -->
+      </div>
+     </div>
+     <div class="flex gap-3"><button onclick="closeStudentModal()" class="flex-1 bg-gray-300 font-semibold py-2 px-4 rounded-lg">Close</button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      background_color: "#f8fafc",
+      header_color: "#1e40af",
+      surface_color: "#ffffff",
+      text_color: "#1e293b",
+      button_color: "#3b82f6",
+      font_family: "system-ui",
+      font_size: 16,
+      school_name: "Continent International School",
+      system_title: "Registration Manager"
+    };
+
+    let currentClass = 'Year 5 River';
+    let studentAttendance = {};
+    let allStudents = [];
+    let attendanceRecords = [];
+
+    // LocalStorage keys
+    const STORAGE_KEYS = {
+      STUDENTS: 'registration_students',
+      ATTENDANCE: 'registration_attendance'
+    };
+
+    // Default student data
+    let classData = {
+      "Year 5 River": [
+        { id: "S001", name: "Alice Brown" },
+        { id: "S002", name: "Bob Johnson" },
+        { id: "S003", name: "Charlie Williams" },
+        { id: "S004", name: "David Garcia" },
+        { id: "S005", name: "Emily Anderson" },
+        { id: "S006", name: "Frank Taylor" },
+        { id: "S007", name: "Grace Martin" },
+        { id: "S008", name: "Harry Jackson" },
+        { id: "S009", name: "Isabella Thompson" },
+        { id: "S010", name: "Jack White" },
+        { id: "S011", name: "Katie Robinson" },
+        { id: "S012", name: "Liam Harris" },
+        { id: "S013", name: "Maya Clark" },
+        { id: "S014", name: "Noah Lewis" },
+        { id: "S015", name: "Olivia Walker" },
+        { id: "S016", name: "Peter Hall" },
+        { id: "S017", name: "Quinn Allen" },
+        { id: "S018", name: "Ruby Young" },
+        { id: "S019", name: "Samuel King" },
+        { id: "S020", name: "Sophia Wright" },
+        { id: "S021", name: "Thomas Green" },
+        { id: "S022", name: "Uma Baker" },
+        { id: "S023", name: "Victor Adams" },
+        { id: "S024", name: "Willow Nelson" },
+        { id: "S025", name: "Xavier Carter" },
+        { id: "S026", name: "Yasmin Mitchell" },
+        { id: "S027", name: "Zara Perez" }
+      ]
+    };
+
+    function initializeApp() {
+      try {
+        // Start clock
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Load saved data
+        loadFromLocalStorage();
+
+        // Set up event listeners
+        const loadBtn = document.getElementById('load-register-btn');
+        const classSelect = document.getElementById('class-select');
+        const addStudentForm = document.getElementById('add-student-form');
+        
+        if (loadBtn) {
+          loadBtn.addEventListener('click', loadRegister);
+        }
+        
+        if (classSelect) {
+          classSelect.addEventListener('change', function(e) {
+            currentClass = e.target.value;
+          });
+        }
+
+        if (addStudentForm) {
+          addStudentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            addNewStudent();
+          });
+        }
+
+        // Initialize Element SDK
+        if (window.elementSdk) {
+          window.elementSdk.init({
+            defaultConfig,
+            onConfigChange: async (config) => {
+              updateUIWithConfig(config);
+            },
+            mapToCapabilities: (config) => ({
+              recolorables: [
+                {
+                  get: () => config.background_color || defaultConfig.background_color,
+                  set: (value) => {
+                    config.background_color = value;
+                    window.elementSdk.setConfig({ background_color: value });
+                  }
+                },
+                {
+                  get: () => config.header_color || defaultConfig.header_color,
+                  set: (value) => {
+                    config.header_color = value;
+                    window.elementSdk.setConfig({ header_color: value });
+                  }
+                },
+                {
+                  get: () => config.surface_color || defaultConfig.surface_color,
+                  set: (value) => {
+                    config.surface_color = value;
+                    window.elementSdk.setConfig({ surface_color: value });
+                  }
+                },
+                {
+                  get: () => config.text_color || defaultConfig.text_color,
+                  set: (value) => {
+                    config.text_color = value;
+                    window.elementSdk.setConfig({ text_color: value });
+                  }
+                },
+                {
+                  get: () => config.button_color || defaultConfig.button_color,
+                  set: (value) => {
+                    config.button_color = value;
+                    window.elementSdk.setConfig({ button_color: value });
+                  }
+                }
+              ],
+              borderables: [],
+              fontEditable: {
+                get: () => config.font_family || defaultConfig.font_family,
+                set: (value) => {
+                  config.font_family = value;
+                  window.elementSdk.setConfig({ font_family: value });
+                }
+              },
+              fontSizeable: {
+                get: () => config.font_size || defaultConfig.font_size,
+                set: (value) => {
+                  config.font_size = value;
+                  window.elementSdk.setConfig({ font_size: value });
+                }
+              }
+            }),
+            mapToEditPanelValues: (config) => new Map([
+              ["school_name", config.school_name || defaultConfig.school_name],
+              ["system_title", config.system_title || defaultConfig.system_title]
+            ])
+          });
+        }
+
+        // Apply initial config
+        updateUIWithConfig(window.elementSdk ? window.elementSdk.config : defaultConfig);
+        
+      } catch (error) {
+        console.error('Initialization error:', error);
+        updateUIWithConfig(defaultConfig);
+      }
+    }
+
+    function updateUIWithConfig(config) {
+      try {
+        const customFont = config.font_family || defaultConfig.font_family;
+        const baseSize = config.font_size || defaultConfig.font_size;
+        const bgColor = config.background_color || defaultConfig.background_color;
+        const headerColor = config.header_color || defaultConfig.header_color;
+        const surfaceColor = config.surface_color || defaultConfig.surface_color;
+        const textColor = config.text_color || defaultConfig.text_color;
+        const buttonColor = config.button_color || defaultConfig.button_color;
+
+        const fontStack = `${customFont}, system-ui, -apple-system, sans-serif`;
+
+        // Apply colors
+        const appWrapper = document.getElementById('app-wrapper');
+        if (appWrapper) appWrapper.style.background = bgColor;
+        document.body.style.background = bgColor;
+        
+        const header = document.querySelector('header');
+        if (header) {
+          header.style.background = surfaceColor;
+          header.style.color = textColor;
+        }
+
+        // Apply fonts and text
+        const schoolName = document.getElementById('school-name');
+        if (schoolName) {
+          schoolName.style.fontFamily = fontStack;
+          schoolName.style.fontSize = `${baseSize * 1.5}px`;
+          schoolName.style.color = textColor;
+          schoolName.textContent = config.school_name || defaultConfig.school_name;
+        }
+
+        const systemTitle = document.getElementById('system-title');
+        if (systemTitle) {
+          systemTitle.style.fontFamily = fontStack;
+          systemTitle.style.fontSize = `${baseSize * 0.875}px`;
+          systemTitle.style.color = textColor;
+          systemTitle.textContent = config.system_title || defaultConfig.system_title;
+        }
+
+        // Apply to all surfaces
+        document.querySelectorAll('.rounded-lg.shadow-md').forEach(el => {
+          el.style.background = surfaceColor;
+          el.style.color = textColor;
+        });
+
+        // Apply button color
+        const loadBtn = document.getElementById('load-register-btn');
+        if (loadBtn) {
+          loadBtn.style.background = buttonColor;
+          loadBtn.style.color = '#ffffff';
+        }
+
+        const submitBtn = document.getElementById('submit-register-btn');
+        if (submitBtn) {
+          submitBtn.style.background = buttonColor;
+          submitBtn.style.color = '#ffffff';
+        }
+
+        // Apply fonts to all elements
+        document.querySelectorAll('label, button, input, select, th, td, p, h3').forEach(el => {
+          el.style.fontFamily = fontStack;
+          el.style.fontSize = `${baseSize}px`;
+        });
+        
+      } catch (error) {
+        console.error('UI update error:', error);
+      }
+    }
+
+    function loadFromLocalStorage() {
+      try {
+        const savedStudents = localStorage.getItem(STORAGE_KEYS.STUDENTS);
+        if (savedStudents) {
+          const parsed = JSON.parse(savedStudents);
+          if (parsed && typeof parsed === 'object') {
+            classData = { ...classData, ...parsed };
+          }
+        }
+        
+        const savedAttendance = localStorage.getItem(STORAGE_KEYS.ATTENDANCE);
+        if (savedAttendance) {
+          const parsed = JSON.parse(savedAttendance);
+          if (Array.isArray(parsed)) {
+            attendanceRecords = parsed;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading from localStorage:', error);
+      }
+    }
+
+    function saveToLocalStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(classData));
+        localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify(attendanceRecords));
+      } catch (error) {
+        console.error('Error saving to localStorage:', error);
+        showToast('Error saving data', 'error');
+      }
+    }
+
+    function updateDateTime() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-GB', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      const timeStr = now.toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit' 
+      });
+      
+      const dateEl = document.getElementById('current-date');
+      const timeEl = document.getElementById('current-time');
+      
+      if (dateEl) dateEl.textContent = dateStr;
+      if (timeEl) timeEl.textContent = timeStr;
+    }
+
+    function loadRegister() {
+      if (!currentClass) {
+        showToast('Please select a class', 'error');
+        return;
+      }
+
+      const students = classData[currentClass] || [];
+      
+      if (students.length === 0) {
+        showToast('No students found in this class', 'error');
+        return;
+      }
+      
+      studentAttendance = {};
+      allStudents = students;
+      
+      students.forEach(student => {
+        studentAttendance[student.id] = {
+          status: null,
+          notes: ''
+        };
+      });
+
+      document.getElementById('empty-state').classList.add('hidden');
+      document.getElementById('register-section').classList.remove('hidden');
+
+      renderStudentList(students);
+      updateSummary();
+      
+      showToast(`Loaded ${students.length} students from ${currentClass}`, 'success');
+    }
+
+    function renderStudentList(students) {
+      const tbody = document.getElementById('student-list');
+      if (!tbody) return;
+      
+      tbody.innerHTML = students.map(student => `
+        <tr class="student-row border-b" data-student-id="${student.id}">
+          <td class="px-6 py-4 font-semibold">${escapeHtml(student.name)}</td>
+          <td class="px-6 py-4">${student.id}</td>
+          <td class="px-6 py-4">
+            <div class="flex gap-2 justify-center flex-wrap">
+              <button 
+                onclick="markAttendance('${student.id}', 'present')" 
+                class="status-btn status-present ${studentAttendance[student.id]?.status === 'present' ? 'active' : ''}"
+                data-status="present"
+              >
+                ✓ Present
+              </button>
+              <button 
+                onclick="markAttendance('${student.id}', 'absent')" 
+                class="status-btn status-absent ${studentAttendance[student.id]?.status === 'absent' ? 'active' : ''}"
+                data-status="absent"
+              >
+                ✗ Absent Unexcused
+              </button>
+              <button 
+                onclick="markAttendance('${student.id}', 'late')" 
+                class="status-btn status-late ${studentAttendance[student.id]?.status === 'late' ? 'active' : ''}"
+                data-status="late"
+              >
+                ⏰ Late
+              </button>
+              <button 
+                onclick="markAttendance('${student.id}', 'excused')" 
+                class="status-btn status-excused ${studentAttendance[student.id]?.status === 'excused' ? 'active' : ''}"
+                data-status="excused"
+              >
+                📄 Absent Excused
+              </button>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <input 
+              type="text" 
+              class="w-full px-3 py-1 border rounded" 
+              placeholder="Add notes or reason..."
+              onchange="updateNotes('${student.id}', this.value)"
+              value="${studentAttendance[student.id]?.notes || ''}"
+            >
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function markAttendance(studentId, status) {
+      if (!studentAttendance[studentId]) return;
+      
+      studentAttendance[studentId].status = status;
+      
+      const row = document.querySelector(`tr[data-student-id="${studentId}"]`);
+      if (row) {
+        row.querySelectorAll('.status-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        const activeBtn = row.querySelector(`[data-status="${status}"]`);
+        if (activeBtn) {
+          activeBtn.classList.add('active');
+        }
+      }
+      
+      updateSummary();
+    }
+
+    function updateNotes(studentId, notes) {
+      if (studentAttendance[studentId]) {
+        studentAttendance[studentId].notes = notes;
+      }
+    }
+
+    function markAllPresent() {
+      Object.keys(studentAttendance).forEach(studentId => {
+        markAttendance(studentId, 'present');
+      });
+      showToast('All students marked as present', 'success');
+    }
+
+    function clearAllAttendance() {
+      Object.keys(studentAttendance).forEach(studentId => {
+        studentAttendance[studentId].status = null;
+        studentAttendance[studentId].notes = '';
+      });
+      
+      const students = classData[currentClass] || [];
+      renderStudentList(students);
+      updateSummary();
+      showToast('All attendance cleared', 'success');
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      
+      const tabBtn = document.getElementById(`tab-${tabName}`);
+      const tabContent = document.getElementById(`content-${tabName}`);
+      
+      if (tabBtn) tabBtn.classList.add('active');
+      if (tabContent) tabContent.classList.remove('hidden');
+      
+      if (tabName === 'history') {
+        loadAttendanceHistory();
+      } else if (tabName === 'reports') {
+        loadReports();
+      }
+    }
+
+    function loadAttendanceHistory() {
+      const tbody = document.getElementById('history-list');
+      const emptyState = document.getElementById('history-empty');
+      const tableContainer = document.getElementById('history-table-container');
+      
+      if (!tbody || !emptyState || !tableContainer) return;
+      
+      if (attendanceRecords.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        tableContainer.classList.add('hidden');
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      tableContainer.classList.remove('hidden');
+      
+      const studentFilter = document.getElementById('history-student-filter');
+      if (studentFilter) {
+        const allStudents = [];
+        
+        for (const className in classData) {
+          classData[className].forEach(student => {
+            if (!allStudents.find(s => s.id === student.id)) {
+              allStudents.push(student);
+            }
+          });
+        }
+        
+        allStudents.sort((a, b) => a.name.localeCompare(b.name));
+        
+        studentFilter.innerHTML = '<option value="">All Students</option>' +
+          allStudents.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+      }
+      
+      renderHistoryList(attendanceRecords);
+    }
+
+    function renderHistoryList(records) {
+      const tbody = document.getElementById('history-list');
+      if (!tbody) return;
+      
+      const sortedRecords = [...records].sort((a, b) => 
+        new Date(b.timestamp) - new Date(a.timestamp)
+      );
+      
+      tbody.innerHTML = sortedRecords.map(record => {
+        const student = findStudentById(record.student_id);
+        const statusClass = getStatusClass(record.status);
+        const timestamp = new Date(record.timestamp);
+        
+        return `
+          <tr class="border-b hover:bg-gray-50">
+            <td class="px-6 py-4">${record.date}</td>
+            <td class="px-6 py-4">${timestamp.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</td>
+            <td class="px-6 py-4 font-semibold">${student ? escapeHtml(student.name) : 'Unknown'}</td>
+            <td class="px-6 py-4">${record.student_id}</td>
+            <td class="px-6 py-4 text-center">
+              <span class="px-3 py-1 rounded-full text-white font-semibold ${statusClass}">
+                ${record.status}
+              </span>
+            </td>
+            <td class="px-6 py-4">${escapeHtml(record.notes || '-')}</td>
+            <td class="px-6 py-4 text-center">
+              <button onclick="deleteAttendanceRecord('${record.id}')" class="text-red-600 hover:text-red-800 font-semibold">
+                Delete
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function findStudentById(studentId) {
+      for (const className in classData) {
+        const student = classData[className].find(s => s.id === studentId);
+        if (student) return student;
+      }
+      return null;
+    }
+
+    function getStatusClass(status) {
+      const classes = {
+        'present': 'bg-green-500',
+        'absent': 'bg-red-500',
+        'late': 'bg-yellow-500',
+        'excused': 'bg-blue-500'
+      };
+      return classes[status] || 'bg-gray-500';
+    }
+
+    function filterHistory() {
+      const dateFilter = document.getElementById('history-date-filter');
+      const studentFilter = document.getElementById('history-student-filter');
+      
+      if (!dateFilter || !studentFilter) return;
+      
+      let filteredRecords = [...attendanceRecords];
+      
+      if (dateFilter.value) {
+        const filterDate = new Date(dateFilter.value).toLocaleDateString('en-GB');
+        filteredRecords = filteredRecords.filter(r => r.date === filterDate);
+      }
+      
+      if (studentFilter.value) {
+        filteredRecords = filteredRecords.filter(r => r.student_id === studentFilter.value);
+      }
+      
+      renderHistoryList(filteredRecords);
+    }
+
+    function clearHistoryFilters() {
+      const dateFilter = document.getElementById('history-date-filter');
+      const studentFilter = document.getElementById('history-student-filter');
+      
+      if (dateFilter) dateFilter.value = '';
+      if (studentFilter) studentFilter.value = '';
+      
+      renderHistoryList(attendanceRecords);
+    }
+
+    function deleteAttendanceRecord(recordId) {
+      const index = attendanceRecords.findIndex(r => r.id === recordId);
+      if (index !== -1) {
+        attendanceRecords.splice(index, 1);
+        saveToLocalStorage();
+        loadAttendanceHistory();
+        showToast('Record deleted successfully', 'success');
+      }
+    }
+
+    function loadReports() {
+      updateOverallStatistics();
+      updateStatusBreakdown();
+      populateReportStudentSelect();
+      
+      const reportSelect = document.getElementById('report-student-select');
+      if (reportSelect) {
+        reportSelect.value = '';
+      }
+      updateStudentReport();
+    }
+
+    function updateOverallStatistics() {
+      const totalRecords = attendanceRecords.length;
+      
+      const statsTotal = document.getElementById('stats-total-records');
+      if (statsTotal) statsTotal.textContent = totalRecords;
+      
+      if (totalRecords === 0) {
+        const statsAvg = document.getElementById('stats-avg-rate');
+        const statsBest = document.getElementById('stats-best-student');
+        if (statsAvg) statsAvg.textContent = '0%';
+        if (statsBest) statsBest.textContent = '-';
+        return;
+      }
+      
+      const presentCount = attendanceRecords.filter(r => r.status === 'present' || r.status === 'late').length;
+      const avgRate = Math.round((presentCount / totalRecords) * 100);
+      
+      const statsAvg = document.getElementById('stats-avg-rate');
+      if (statsAvg) statsAvg.textContent = `${avgRate}%`;
+      
+      const studentStats = {};
+      attendanceRecords.forEach(record => {
+        if (!studentStats[record.student_id]) {
+          studentStats[record.student_id] = { present: 0, total: 0 };
+        }
+        studentStats[record.student_id].total++;
+        if (record.status === 'present') {
+          studentStats[record.student_id].present++;
+        }
+      });
+      
+      let bestStudent = null;
+      let bestRate = 0;
+      
+      Object.keys(studentStats).forEach(studentId => {
+        const stats = studentStats[studentId];
+        if (stats.total > 0) {
+          const rate = (stats.present / stats.total) * 100;
+          if (rate > bestRate || (rate === bestRate && stats.total > (studentStats[bestStudent]?.total || 0))) {
+            bestRate = rate;
+            bestStudent = studentId;
+          }
+        }
+      });
+      
+      const statsBest = document.getElementById('stats-best-student');
+      if (statsBest) {
+        if (bestStudent) {
+          const student = findStudentById(bestStudent);
+          statsBest.textContent = student ? `${student.name} (${Math.round(bestRate)}%)` : '-';
+        } else {
+          statsBest.textContent = '-';
+        }
+      }
+    }
+
+    function updateStatusBreakdown() {
+      const statusCounts = {
+        present: 0,
+        absent: 0,
+        late: 0,
+        excused: 0
+      };
+      
+      attendanceRecords.forEach(record => {
+        if (statusCounts.hasOwnProperty(record.status)) {
+          statusCounts[record.status]++;
+        }
+      });
+      
+      const total = attendanceRecords.length || 1;
+      
+      Object.keys(statusCounts).forEach(status => {
+        const count = statusCounts[status];
+        const percentage = Math.round((count / total) * 100);
+        
+        const countEl = document.getElementById(`breakdown-${status}`);
+        const pctEl = document.getElementById(`breakdown-${status}-pct`);
+        
+        if (countEl) countEl.textContent = count;
+        if (pctEl) pctEl.textContent = `${percentage}%`;
+      });
+    }
+
+    function populateReportStudentSelect() {
+      const select = document.getElementById('report-student-select');
+      if (!select) return;
+      
+      const allStudents = [];
+      for (const className in classData) {
+        classData[className].forEach(student => {
+          if (!allStudents.find(s => s.id === student.id)) {
+            allStudents.push(student);
+          }
+        });
+      }
+      
+      allStudents.sort((a, b) => a.name.localeCompare(b.name));
+      
+      select.innerHTML = '<option value="">Choose a student...</option>' +
+        allStudents.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+    }
+
+    function updateStudentReport() {
+      const select = document.getElementById('report-student-select');
+      const studentId = select ? select.value : '';
+      
+      if (!studentId) {
+        const fields = ['total-days', 'present', 'absent', 'late', 'excused'];
+        fields.forEach(field => {
+          const el = document.getElementById(`report-${field}`);
+          if (el) el.textContent = '0';
+        });
+        const rateEl = document.getElementById('report-rate');
+        if (rateEl) rateEl.textContent = '0%';
+        return;
+      }
+      
+      const studentRecords = attendanceRecords.filter(r => r.student_id === studentId);
+      
+      const stats = {
+        total: studentRecords.length,
+        present: studentRecords.filter(r => r.status === 'present').length,
+        absent: studentRecords.filter(r => r.status === 'absent').length,
+        late: studentRecords.filter(r => r.status === 'late').length,
+        excused: studentRecords.filter(r => r.status === 'excused').length
+      };
+      
+      const attendanceRate = stats.total > 0 
+        ? Math.round(((stats.present + stats.late) / stats.total) * 100) 
+        : 0;
+      
+      Object.keys(stats).forEach(key => {
+        const el = document.getElementById(`report-${key === 'total' ? 'total-days' : key}`);
+        if (el) el.textContent = stats[key];
+      });
+      
+      const rateEl = document.getElementById('report-rate');
+      if (rateEl) rateEl.textContent = `${attendanceRate}%`;
+    }
+
+    function exportToCSV() {
+      if (attendanceRecords.length === 0) {
+        showToast('No data to export', 'error');
+        return;
+      }
+      
+      let csv = 'Date,Time,Class,Student Name,Student ID,Status,Notes\n';
+      
+      const sortedRecords = [...attendanceRecords].sort((a, b) => 
+        new Date(b.timestamp) - new Date(a.timestamp)
+      );
+      
+      sortedRecords.forEach(record => {
+        const student = findStudentById(record.student_id);
+        const timestamp = new Date(record.timestamp);
+        const time = timestamp.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        const studentName = student ? student.name : 'Unknown';
+        const className = record.class_name || 'Unknown';
+        const notes = (record.notes || '').replace(/"/g, '""');
+        
+        csv += `"${record.date}","${time}","${className}","${studentName}","${record.student_id}","${record.status}","${notes}"\n`;
+      });
+      
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `attendance_records_${new Date().toISOString().split('T')[0]}.csv`;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      
+      setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+      
+      showToast('CSV exported successfully', 'success');
+    }
+
+    function printReport() {
+      if (attendanceRecords.length === 0) {
+        showToast('No data to print', 'error');
+        return;
+      }
+      
+      const printWindow = window.open('', '_blank', 'noopener,noreferrer');
+      
+      if (!printWindow) {
+        showToast('Please allow popups to print reports', 'error');
+        return;
+      }
+      
+      const sortedRecords = [...attendanceRecords].sort((a, b) => 
+        new Date(b.timestamp) - new Date(a.timestamp)
+      );
+      
+      const presentCount = attendanceRecords.filter(r => r.status === 'present').length;
+      const absentCount = attendanceRecords.filter(r => r.status === 'absent').length;
+      const lateCount = attendanceRecords.filter(r => r.status === 'late').length;
+      const excusedCount = attendanceRecords.filter(r => r.status === 'excused').length;
+      const attendanceRate = attendanceRecords.length > 0 
+        ? Math.round((presentCount + lateCount) / attendanceRecords.length * 100)
+        : 0;
+      
+      const reportHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Attendance Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; margin: 0; }
+            h1 { color: #1e40af; margin-bottom: 10px; }
+            .header-info { margin-bottom: 20px; color: #666; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; page-break-inside: auto; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
+            th { background-color: #1e40af; color: white; font-weight: bold; }
+            tbody tr:nth-child(even) { background-color: #f9f9f9; }
+            .summary { margin: 20px 0; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #1e40af; }
+            .summary h2 { margin-top: 0; color: #1e40af; }
+            .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .summary-item { padding: 8px; background: white; border-radius: 4px; }
+            .summary-label { font-weight: bold; color: #666; font-size: 12px; }
+            .summary-value { font-size: 20px; font-weight: bold; color: #1e40af; }
+            @media print {
+              body { padding: 10px; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Attendance Report</h1>
+          <div class="header-info">
+            <strong>School:</strong> Continent International School<br>
+            <strong>Class:</strong> ${currentClass || 'All Classes'}<br>
+            <strong>Generated:</strong> ${new Date().toLocaleString('en-GB', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </div>
+          
+          <div class="summary">
+            <h2>Summary Statistics</h2>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <div class="summary-label">Total Records</div>
+                <div class="summary-value">${attendanceRecords.length}</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">Present</div>
+                <div class="summary-value" style="color: #10b981;">${presentCount}</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">Absent</div>
+                <div class="summary-value" style="color: #ef4444;">${absentCount}</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">Late</div>
+                <div class="summary-value" style="color: #f59e0b;">${lateCount}</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">Excused</div>
+                <div class="summary-value" style="color: #6366f1;">${excusedCount}</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">Attendance Rate</div>
+                <div class="summary-value">${attendanceRate}%</div>
+              </div>
+            </div>
+          </div>
+          
+          <h2>Detailed Records</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Class</th>
+                <th>Student Name</th>
+                <th>Student ID</th>
+                <th>Status</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${sortedRecords.map(record => {
+                const student = findStudentById(record.student_id);
+                const timestamp = new Date(record.timestamp);
+                const time = timestamp.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                return `
+                  <tr>
+                    <td>${record.date}</td>
+                    <td>${time}</td>
+                    <td>${record.class_name || 'Unknown'}</td>
+                    <td>${student ? escapeHtml(student.name) : 'Unknown'}</td>
+                    <td>${record.student_id}</td>
+                    <td><strong>${record.status.toUpperCase()}</strong></td>
+                    <td>${escapeHtml(record.notes || '-')}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+          
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 250);
+            };
+          <\/script>
+        </body>
+        </html>
+      `;
+      
+      printWindow.document.write(reportHTML);
+      printWindow.document.close();
+    }
+
+    function clearAllData() {
+      const overlay = document.createElement('div');
+      overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+      overlay.id = 'clear-data-overlay';
+      
+      const modalDiv = document.createElement('div');
+      modalDiv.className = 'bg-white rounded-lg p-8 max-w-md';
+      
+      const heading = document.createElement('h3');
+      heading.className = 'text-2xl font-bold mb-4 text-red-600';
+      heading.textContent = '⚠️ Clear All Data?';
+      
+      const description = document.createElement('p');
+      description.className = 'mb-6';
+      description.textContent = 'This will permanently delete all attendance records and student data. This action cannot be undone!';
+      
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'flex gap-3';
+      
+      const confirmBtn = document.createElement('button');
+      confirmBtn.className = 'flex-1 bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700';
+      confirmBtn.textContent = 'Yes, Delete Everything';
+      confirmBtn.onclick = confirmClearAllData;
+      
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'flex-1 bg-gray-300 font-semibold py-2 px-4 rounded-lg hover:bg-gray-400';
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.onclick = function() {
+        const overlayEl = document.getElementById('clear-data-overlay');
+        if (overlayEl) overlayEl.remove();
+      };
+      
+      buttonContainer.appendChild(confirmBtn);
+      buttonContainer.appendChild(cancelBtn);
+      
+      modalDiv.appendChild(heading);
+      modalDiv.appendChild(description);
+      modalDiv.appendChild(buttonContainer);
+      
+      overlay.appendChild(modalDiv);
+      document.body.appendChild(overlay);
+    }
+
+    function confirmClearAllData() {
+      classData = {
+        "Year 5 River": [
+          { id: "S001", name: "Alice Brown" },
+          { id: "S002", name: "Bob Johnson" },
+          { id: "S003", name: "Charlie Williams" },
+          { id: "S004", name: "David Garcia" },
+          { id: "S005", name: "Emily Anderson" }
+        ]
+      };
+      attendanceRecords = [];
+      studentAttendance = {};
+      
+      saveToLocalStorage();
+      
+      const overlay = document.querySelector('.fixed.inset-0');
+      if (overlay) overlay.remove();
+      
+      if (!document.getElementById('register-section').classList.contains('hidden')) {
+        loadReports();
+        loadAttendanceHistory();
+      }
+      
+      showToast('All data has been cleared', 'success');
+    }
+
+    function updateSummary() {
+      const total = Object.keys(studentAttendance).length;
+      let present = 0, absent = 0, late = 0, excused = 0;
+      
+      Object.values(studentAttendance).forEach(record => {
+        if (record.status === 'present') present++;
+        else if (record.status === 'absent') absent++;
+        else if (record.status === 'late') late++;
+        else if (record.status === 'excused') excused++;
+      });
+      
+      const totalEl = document.getElementById('total-students');
+      const presentEl = document.getElementById('present-count');
+      const absentEl = document.getElementById('absent-count');
+      const lateEl = document.getElementById('late-count');
+      const excusedEl = document.getElementById('excused-count');
+      
+      if (totalEl) totalEl.textContent = total;
+      if (presentEl) presentEl.textContent = present;
+      if (absentEl) absentEl.textContent = absent;
+      if (lateEl) lateEl.textContent = late;
+      if (excusedEl) excusedEl.textContent = excused;
+    }
+
+    function submitRegister() {
+      const unregistered = Object.values(studentAttendance).filter(r => !r.status).length;
+      
+      if (unregistered > 0) {
+        showToast(`Warning: ${unregistered} students not yet registered`, 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('submit-register-btn');
+      if (!submitBtn) return;
+      
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Saving...';
+      
+      setTimeout(() => {
+        try {
+          const now = new Date();
+          const timestamp = now.toISOString();
+          const dateStr = now.toLocaleDateString('en-GB');
+          
+          for (const [studentId, record] of Object.entries(studentAttendance)) {
+            if (record.status) {
+              const attendanceRecord = {
+                id: `${currentClass}_${studentId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                class_name: currentClass,
+                student_id: studentId,
+                status: record.status,
+                notes: record.notes || '',
+                timestamp: timestamp,
+                date: dateStr
+              };
+              
+              attendanceRecords.push(attendanceRecord);
+            }
+          }
+          
+          saveToLocalStorage();
+          
+          showToast(`Register submitted successfully for ${currentClass}`, 'success');
+          
+          Object.keys(studentAttendance).forEach(studentId => {
+            studentAttendance[studentId].status = null;
+            studentAttendance[studentId].notes = '';
+          });
+          
+          const students = classData[currentClass] || [];
+          renderStudentList(students);
+          updateSummary();
+          
+        } catch (error) {
+          console.error('Submit error:', error);
+          showToast('Error submitting register', 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }, 100);
+    }
+
+    function showStudentManagement() {
+      if (!currentClass) {
+        showToast('Please load a class register first', 'error');
+        return;
+      }
+
+      const modalClassName = document.getElementById('modal-class-name');
+      if (modalClassName) {
+        modalClassName.textContent = currentClass;
+      }
+      
+      renderStudentManagementList();
+      
+      const modal = document.getElementById('student-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+      }
+    }
+
+    function closeStudentModal() {
+      const modal = document.getElementById('student-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+      
+      const nameInput = document.getElementById('new-student-name');
+      const idInput = document.getElementById('new-student-id');
+      if (nameInput) nameInput.value = '';
+      if (idInput) idInput.value = '';
+      
+      if (!document.getElementById('register-section').classList.contains('hidden')) {
+        const students = classData[currentClass] || [];
+        renderStudentList(students);
+        updateSummary();
+      }
+    }
+
+    function renderStudentManagementList() {
+      const students = classData[currentClass] || [];
+      const container = document.getElementById('student-management-list');
+      const countEl = document.getElementById('student-modal-count');
+      
+      if (!container) return;
+      if (countEl) countEl.textContent = students.length;
+
+      container.innerHTML = students.map((student, index) => `
+        <div class="flex items-center justify-between bg-white border-2 rounded-lg p-3">
+          <div class="flex items-center gap-3">
+            <span class="font-semibold text-gray-600">${index + 1}.</span>
+            <div>
+              <div class="font-semibold">${escapeHtml(student.name)}</div>
+              <div class="text-sm text-gray-600">${student.id}</div>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button 
+              onclick="editStudent('${student.id}')" 
+              class="bg-blue-500 text-white px-3 py-1 rounded text-sm font-semibold hover:bg-blue-600"
+            >
+              ✏️ Edit
+            </button>
+            <button 
+              onclick="removeStudent('${student.id}')" 
+              class="bg-red-500 text-white px-3 py-1 rounded text-sm font-semibold hover:bg-red-600"
+            >
+              🗑️ Remove
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addNewStudent() {
+      const nameInput = document.getElementById('new-student-name');
+      const idInput = document.getElementById('new-student-id');
+      
+      if (!nameInput || !idInput) return;
+      
+      const name = nameInput.value.trim();
+      const id = idInput.value.trim();
+
+      if (!name || !id) {
+        showToast('Please enter both name and ID', 'error');
+        return;
+      }
+
+      const students = classData[currentClass] || [];
+      if (students.some(s => s.id === id)) {
+        showToast('Student ID already exists', 'error');
+        return;
+      }
+
+      if (!classData[currentClass]) {
+        classData[currentClass] = [];
+      }
+      classData[currentClass].push({ id, name });
+
+      studentAttendance[id] = {
+        status: null,
+        notes: ''
+      };
+
+      saveToLocalStorage();
+
+      nameInput.value = '';
+      idInput.value = '';
+
+      renderStudentManagementList();
+      renderStudentList(classData[currentClass]);
+      updateSummary();
+      
+      showToast('Student added successfully', 'success');
+    }
+
+    function editStudent(studentId) {
+      const students = classData[currentClass] || [];
+      const student = students.find(s => s.id === studentId);
+      
+      if (!student) return;
+
+      const container = document.getElementById('student-management-list');
+      if (!container) return;
+      
+      const studentElements = Array.from(container.children);
+      const studentElement = studentElements.find(el => {
+        return el.querySelector(`button[onclick*="editStudent('${studentId}')"]`) !== null;
+      });
+
+      if (!studentElement) return;
+
+      studentElement.innerHTML = `
+        <div class="flex items-center gap-3 flex-1">
+          <div class="flex-1">
+            <input 
+              type="text" 
+              id="edit-name-${studentId}" 
+              value="${escapeHtml(student.name)}" 
+              class="w-full px-3 py-2 border-2 rounded-lg font-semibold"
+              placeholder="Student name"
+            >
+          </div>
+          <div class="w-32">
+            <input 
+              type="text" 
+              id="edit-id-${studentId}" 
+              value="${student.id}" 
+              class="w-full px-3 py-2 border-2 rounded-lg"
+              placeholder="Student ID"
+            >
+          </div>
+          <div class="flex gap-2">
+            <button 
+              onclick="confirmEditStudent('${studentId}')" 
+              class="bg-green-600 text-white px-4 py-1 rounded font-semibold whitespace-nowrap"
+            >
+              ✓ Save
+            </button>
+            <button 
+              onclick="renderStudentManagementList()" 
+              class="bg-gray-300 px-4 py-1 rounded font-semibold"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      `;
+
+      setTimeout(() => {
+        const input = document.getElementById(`edit-name-${studentId}`);
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }, 0);
+    }
+
+    function confirmEditStudent(studentId) {
+      const nameInput = document.getElementById(`edit-name-${studentId}`);
+      const idInput = document.getElementById(`edit-id-${studentId}`);
+      
+      if (!nameInput || !idInput) return;
+
+      const newName = nameInput.value.trim();
+      const newId = idInput.value.trim();
+      
+      if (!newName || !newId) {
+        showToast('Name and ID cannot be empty', 'error');
+        return;
+      }
+
+      const students = classData[currentClass] || [];
+      
+      if (newId !== studentId && students.some(s => s.id === newId)) {
+        showToast('Student ID already exists', 'error');
+        return;
+      }
+
+      const student = students.find(s => s.id === studentId);
+      
+      if (student) {
+        if (newId !== studentId && studentAttendance[studentId]) {
+          studentAttendance[newId] = studentAttendance[studentId];
+          delete studentAttendance[studentId];
+        }
+        
+        student.name = newName;
+        student.id = newId;
+        
+        saveToLocalStorage();
+        
+        renderStudentManagementList();
+        renderStudentList(classData[currentClass]);
+        showToast('Student updated successfully', 'success');
+      }
+    }
+
+    function removeStudent(studentId) {
+      const students = classData[currentClass] || [];
+      const student = students.find(s => s.id === studentId);
+      
+      if (!student) return;
+
+      const container = document.getElementById('student-management-list');
+      if (!container) return;
+      
+      const studentElements = Array.from(container.children);
+      const studentElement = studentElements.find(el => {
+        return el.querySelector(`button[onclick*="${studentId}"]`) !== null;
+      });
+
+      if (!studentElement) return;
+
+      studentElement.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="font-semibold">Delete ${escapeHtml(student.name)}?</span>
+          <div class="flex gap-2">
+            <button 
+              onclick="confirmRemoveStudent('${studentId}')" 
+              class="bg-red-600 text-white px-4 py-1 rounded font-semibold"
+            >
+              Confirm Delete
+            </button>
+            <button 
+              onclick="renderStudentManagementList()" 
+              class="bg-gray-300 px-4 py-1 rounded font-semibold"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function confirmRemoveStudent(studentId) {
+      const students = classData[currentClass] || [];
+      const index = students.findIndex(s => s.id === studentId);
+      
+      if (index !== -1) {
+        students.splice(index, 1);
+        delete studentAttendance[studentId];
+        
+        saveToLocalStorage();
+        
+        renderStudentManagementList();
+        renderStudentList(classData[currentClass]);
+        updateSummary();
+        
+        showToast('Student removed successfully', 'success');
+      }
+    }
+
+    function showToast(message, type) {
+      const toast = document.createElement('div');
+      toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg font-semibold z-50 ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+      } text-white`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.remove();
+        }
+      }, 3000);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+      initializeApp();
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ad21fc21192d02a',t:'MTc2NTU5MzkxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

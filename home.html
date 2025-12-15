@@ -344,40 +344,40 @@
       ATTENDANCE: 'registration_attendance'
     };
 
-    // Default student data
+    // Default student data - each class has independent student lists
     let classData = {
       "Year 5 River": [
-        { id: "S001", name: "Alice Brown" },
-        { id: "S002", name: "Bob Johnson" },
-        { id: "S003", name: "Charlie Williams" },
-        { id: "S004", name: "David Garcia" },
-        { id: "S005", name: "Emily Anderson" },
-        { id: "S006", name: "Frank Taylor" },
-        { id: "S007", name: "Grace Martin" },
-        { id: "S008", name: "Harry Jackson" },
-        { id: "S009", name: "Isabella Thompson" },
-        { id: "S010", name: "Jack White" },
-        { id: "S011", name: "Katie Robinson" },
-        { id: "S012", name: "Liam Harris" },
-        { id: "S013", name: "Maya Clark" },
-        { id: "S014", name: "Noah Lewis" },
-        { id: "S015", name: "Olivia Walker" },
-        { id: "S016", name: "Peter Hall" },
-        { id: "S017", name: "Quinn Allen" },
-        { id: "S018", name: "Ruby Young" },
-        { id: "S019", name: "Samuel King" },
-        { id: "S020", name: "Sophia Wright" },
-        { id: "S021", name: "Thomas Green" },
-        { id: "S022", name: "Uma Baker" },
-        { id: "S023", name: "Victor Adams" },
-        { id: "S024", name: "Willow Nelson" },
-        { id: "S025", name: "Xavier Carter" },
-        { id: "S026", name: "Yasmin Mitchell" },
-        { id: "S027", name: "Zara Perez" }
+        { id: "R001", name: "Alice Brown" },
+        { id: "R002", name: "Bob Johnson" },
+        { id: "R003", name: "Charlie Williams" },
+        { id: "R004", name: "David Garcia" },
+        { id: "R005", name: "Emily Anderson" },
+        { id: "R006", name: "Frank Taylor" },
+        { id: "R007", name: "Grace Martin" },
+        { id: "R008", name: "Harry Jackson" },
+        { id: "R009", name: "Isabella Thompson" },
+        { id: "R010", name: "Jack White" },
+        { id: "R011", name: "Katie Robinson" },
+        { id: "R012", name: "Liam Harris" },
+        { id: "R013", name: "Maya Clark" },
+        { id: "R014", name: "Noah Lewis" },
+        { id: "R015", name: "Olivia Walker" },
+        { id: "R016", name: "Peter Hall" },
+        { id: "R017", name: "Quinn Allen" },
+        { id: "R018", name: "Ruby Young" },
+        { id: "R019", name: "Samuel King" },
+        { id: "R020", name: "Sophia Wright" },
+        { id: "R021", name: "Thomas Green" },
+        { id: "R022", name: "Uma Baker" },
+        { id: "R023", name: "Victor Adams" },
+        { id: "R024", name: "Willow Nelson" },
+        { id: "R025", name: "Xavier Carter" },
+        { id: "R026", name: "Yasmin Mitchell" },
+        { id: "R027", name: "Zara Perez" }
       ],
       "Year 5 Space": [
-        { id: "S101", name: "Yard Fon" },
-        { id: "S102", name: "Chaluai Tuy" }
+        { id: "S001", name: "Yard Fon" },
+        { id: "S002", name: "Chaluai Tuy" }
       ]
     };
 
@@ -1240,7 +1240,7 @@
       
       const heading = document.createElement('h3');
       heading.className = 'text-2xl font-bold mb-4 text-red-600';
-      heading.textContent = '⚠️ Clear All Data?';
+      heading.textContent = '���️ Clear All Data?';
       
       const description = document.createElement('p');
       description.className = 'mb-6';
@@ -1276,18 +1276,15 @@
     function confirmClearAllData() {
       classData = {
         "Year 5 River": [
-          { id: "S001", name: "Alice Brown" },
-          { id: "S002", name: "Bob Johnson" },
-          { id: "S003", name: "Charlie Williams" },
-          { id: "S004", name: "David Garcia" },
-          { id: "S005", name: "Emily Anderson" }
+          { id: "R001", name: "Alice Brown" },
+          { id: "R002", name: "Bob Johnson" },
+          { id: "R003", name: "Charlie Williams" },
+          { id: "R004", name: "David Garcia" },
+          { id: "R005", name: "Emily Anderson" }
         ],
         "Year 5 Space": [
-          { id: "S101", name: "Aaron Foster" },
-          { id: "S102", name: "Bella Cruz" },
-          { id: "S103", name: "Cameron Scott" },
-          { id: "S104", name: "Diana Reed" },
-          { id: "S105", name: "Ethan Morgan" }
+          { id: "S001", name: "Yard Fon" },
+          { id: "S002", name: "Chaluai Tuy" }
         ]
       };
       attendanceRecords = [];
@@ -1295,7 +1292,7 @@
       
       saveToLocalStorage();
       
-      const overlay = document.getElementById('clear-data-overlay');
+      const overlay = document.querySelector('.fixed.inset-0');
       if (overlay) overlay.remove();
       
       if (!document.getElementById('register-section').classList.contains('hidden')) {
@@ -1688,5 +1685,5 @@
       initializeApp();
     }
   </script>
-</body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ae4dbffa3d474f2',t:'MTc2NTc5MDM2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

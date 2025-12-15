@@ -95,7 +95,7 @@
     <div class="max-w-7xl mx-auto px-6 py-6"><!-- Class Selection -->
      <div class="rounded-lg shadow-md p-6 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-       <div><label for="class-select" class="block text-sm font-semibold mb-2">Select Class/Form</label> <select id="class-select" class="w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2"> <option value="">Choose a class...</option> <option value="Year 5 River" selected>Year 5 River</option> </select>
+       <div><label for="class-select" class="block text-sm font-semibold mb-2">Select Class/Form</label> <select id="class-select" class="w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2"> <option value="">Choose a class...</option> <option value="Year 5 River" selected>Year 5 River</option> <option value="Year 5 Space">Year 5 Space</option> </select>
        </div>
        <div class="flex items-end"><button id="load-register-btn" class="w-full font-semibold py-2 px-6 rounded-lg transition-colors"> Load Register </button>
        </div>
@@ -374,6 +374,10 @@
         { id: "S025", name: "Xavier Carter" },
         { id: "S026", name: "Yasmin Mitchell" },
         { id: "S027", name: "Zara Perez" }
+      ],
+      "Year 5 Space": [
+        { id: "S101", name: "Yard Fon" },
+        { id: "S102", name: "Chaluai Tuy" }
       ]
     };
 
@@ -1277,6 +1281,13 @@
           { id: "S003", name: "Charlie Williams" },
           { id: "S004", name: "David Garcia" },
           { id: "S005", name: "Emily Anderson" }
+        ],
+        "Year 5 Space": [
+          { id: "S101", name: "Aaron Foster" },
+          { id: "S102", name: "Bella Cruz" },
+          { id: "S103", name: "Cameron Scott" },
+          { id: "S104", name: "Diana Reed" },
+          { id: "S105", name: "Ethan Morgan" }
         ]
       };
       attendanceRecords = [];
@@ -1284,7 +1295,7 @@
       
       saveToLocalStorage();
       
-      const overlay = document.querySelector('.fixed.inset-0');
+      const overlay = document.getElementById('clear-data-overlay');
       if (overlay) overlay.remove();
       
       if (!document.getElementById('register-section').classList.contains('hidden')) {
@@ -1677,5 +1688,5 @@
       initializeApp();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ad21fc21192d02a',t:'MTc2NTU5MzkxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
